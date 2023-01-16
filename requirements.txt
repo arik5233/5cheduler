@@ -1,0 +1,7 @@
+bs4==0.0.1
+Flask==2.2.2
+prettytable==3.6.0
+python-certifi-win32==1.6.1
+python-dateutil==2.8.2
+requests==2.28.1
+
