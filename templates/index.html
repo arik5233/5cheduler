@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.5/axios.min.js"
+        integrity="sha512-JEXkqJItqNp0+qvX53ETuwTLoz/r1Tn5yTRnZWWz0ghMKM2WFCEYLdQnsdcYnryMNANMAnxNcBa/dN7wQtESdw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- add javascript script -->
+    <script src="static/js/script.js"></script>
+    <title>Scheduler</title>
+
+    <style>
+        label {
+            font-size: larger;
+        }
+
+        /* div.wrapper {
+            width: 300px;
+            height:300px;
+            border:1px solid black;
+        }
+
+        input[type="text"] {
+             display: block;
+             margin : 0 auto;
+        } */
+
+        /* center all the contents of all the div */
+        /* div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        } */
+    </style>
+
+</head>
+<script>
+    function addFaculty(idx, faculties, courses) {
+        //     // var arr = [];
+        //     // console.log(i)
+        //     // console.log(idx)
+
+        // console.log(idx, faculties, courses);
+        for (var eachIDX of idx) {
+            var div = document.getElementById("course" + eachIDX);
+            // for (var i = 0; i < faculties.length; i++) {
+            for (var j = 0; j < faculties[eachIDX - 1].length; j++) {
+                var checkbox = document.createElement("input");
+                var label = document.createElement("label");
+                checkbox.type = "checkbox";
+                checkbox.id = "checkbox" + eachIDX + j;
+                checkbox.name = "checkboxFaculty" + eachIDX;
+                checkbox.value = faculties[eachIDX - 1][j];
+                // checkbox.checked = true;
+                label.innerHTML = faculties[eachIDX - 1][j] + ":";
+                label.htmlFor = faculties[eachIDX - 1][j];
+                div.appendChild(label);
+                div.appendChild(checkbox);
+            }
+        }
+        return faculties
+    }
+    // }
+    async function getFaculties() {
+        var no = document.getElementById("no_of_courses").value;
+        var courseFaculties = [];
+        var idx = [];
+        var courses = [];
+        for (var i = 1; i <= no; i++) {
+            idx.push(i);
+            var input = document.getElementById("Course" + i).value;
+            courses.push(input);
+
+        }
+
+        // var xhr = new XMLHttpRequest();
+        // xhr.open("POST", "/process_input", true);
+        // xhr.setRequestHeader("Content-Type", "application/json");
+        // xhr.send(JSON.stringify({ courses: courses }));
+        // xhr.onload = function () {
+        //     var allFaculties = JSON.parse(xhr.responseText);
+        //     for (var eachCourseFaculty of allFaculties) {
+        //         var uniqueFaculties = new Set(eachCourseFaculty);
+        //         var faculties = Array.from(uniqueFaculties);
+        //         courseFaculties.push(faculties);
+        //     }
+        // }
+
+        await axios.post("/process_input", { courses: courses, no: no })
+            .then(function (response) {
+                var allFaculties = response.data;
+                for (var eachCourseFaculty of allFaculties) {
+                    //     var uniqueFaculties = new Set(eachCourseFaculty);
+                    //     var faculties = Array.from(uniqueFaculties);
+                    courseFaculties.push(eachCourseFaculty);
+                }
+
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        // console.log(idx, courseFaculties, courses);
+        return [idx, courseFaculties, courses];
+
+
+    }
+
+    function coursesNO() {
+        var no = document.getElementById("no_of_courses").value;
+        document.getElementById("no_of_courses").disabled = true;
+        var button = document.createElement("input");
+        var field_set = document.createElement("fieldset");
+        field_set.id = "allcourses1";
+        var legend = document.createElement("legend");
+        legend.innerHTML = "Select Courses";
+        field_set.appendChild(legend);
+        document.getElementById("coursescontainer").appendChild(field_set);
+
+        for (var i = 1; i <= no; i++) {
+            var div = document.createElement("div");
+            div.name = "courses"
+            div.id = "course" + i;
+            div.style.padding = "5px";
+            var textfield = document.createElement("input");
+            var label = document.createElement("label");
+            label.innerHTML = "Course " + i + ":  ";
+            label.for = "Course" + i;
+            textfield.type = "text";
+            textfield.value = "";
+            textfield.id = "Course" + i;
+            textfield.name = "course";
+
+            document.getElementById("allcourses1").appendChild(div);
+            document.getElementById("course" + i).appendChild(label);
+            document.getElementById("course" + i).appendChild(textfield);
+
+            document.getElementById("allcourses1").appendChild(document.createElement("br"));
+            document.getElementById("allcourses1").appendChild(document.createElement("br"));
+
+        }
+        document.getElementById("allcourses1").appendChild(button);
+        button.type = "button";
+        button.value = "Get Faculties";
+        var courses = [];
+        button.onclick = async function () {
+            let [idx, courseFaculties, courses] = await getFaculties();
+            // console.log(idx, courseFaculties, courses);
+            addFaculty(idx, courseFaculties, courses);
+            // disable button
+            button.disabled = true;
+
+            // for (var eachIDX of idx) {
+            //     // console.log("course" + eachIDX);
+            //     for (var i = 0; i < courseFaculties.length; i++) {
+            //         // console.log(courseFaculties[i]);
+            //         for (var j = 0; j < courseFaculties[i].length; j++) {
+            //             var checkbox = document.createElement("input");
+            //             var label = document.createElement("label");
+            //             checkbox.type = "checkbox";
+            //             checkbox.id = "checkbox" + eachIDX + j;
+            //             checkbox.name = "checkboxFaculty";
+            //             checkbox.value = courseFaculties[i][j];
+            //             label.innerHTML = courseFaculties[i][j] + ":";
+            //             label.htmlFor = courseFaculties[i][j];
+            //             document.getElementById("course" + eachIDX).appendChild(label);
+            //             document.getElementById("course" + eachIDX).appendChild(checkbox);
+            //         }
+            //     }
+
+            // }
+        }
+    }
+    function getCourses() {
+        var no = document.getElementById("no_of_courses").value;
+        var courses = [];
+        for (var i = 1; i <= no; i++) {
+            var course = document.getElementById("Course" + i).value;
+            courses.push(course);
+        }
+        // console.log(courses);
+        return courses;
+    }
+    // function getFaculties(){
+
+    // }
+    function getDays() {
+        var days = [];
+        var dayscontainer = document.getElementById("dayscontainer");
+        var inputs = dayscontainer.getElementsByTagName("input");
+        for (var i = 0; i < inputs.length; i++) {
+            if (inputs[i].checked) {
+                days.push(inputs[i].value);
+            }
+        }
+        // console.log(days);
+        return days;
+    }
+    function getTimes() {
+        var times = [];
+        var timescontainer = document.getElementById("timescontainer");
+        var inputs = timescontainer.getElementsByTagName("input");
+        for (var i = 0; i < inputs.length; i++) {
+            if (inputs[i].checked) {
+                times.push(inputs[i].value);
+            }
+        }
+        // console.log(times);
+        return times;
+    }
+</script>
+<!-- <div id="courses" style="width: auto; background-color: pink; padding: 1%">
+    <h2 style="display: flex; justify-content: center">BRACU Courses</h2>
+    <form method="post" id="form" 
+        style="width: auto; display: flex; justify-content: center; background-color: pink; padding: 1%;">
+        <label for="no_of_courses"> Enter number of courses: </label>
+        <input type="type" id="no_of_courses" name = "count" oninput="coursesNO()" value="" />
+    </form>
+</div> -->
+<form action="/routines" id="routine" method="post" name="dayscontainer">
+    <div id="courses" style="width: auto; background-color: pink; padding: 2%;">
+        <h2 style="display: flex; justify-content: center;">BRACU Courses</h2><br>
+        <!-- create a div to center align all the elements in it -->
+        <div style="display: flex; justify-content: center;">
+            <label for="no_of_courses"> Enter number of courses: </label>
+            <input type="number" id="no_of_courses" name="count" oninput="coursesNO()" />
+        </div>
+        <!-- <label for="no_of_courses" > Enter number of courses: </label>
+            <input type="type" id="no_of_courses" name = "count" oninput="coursesNO()" value="" /> -->
+    </div>
+    <div id="inputs" style="width: auto; height:max-content; padding:1%;  background-color: powderblue;">
+
+        <div id="coursescontainer" style="padding: 2%" oninput="getCourses()">
+
+            <!-- display: grid; place-items: center; -->
+            <!-- 'width: auto; margin: auto; display: relative; justify-content: center; text-align: center; padding: 2%' -->
+        </div>
+
+        <!-- <div id="facultylist" style ="padding: 2%">
+            
+        </div> -->
+
+        <div id="dayscontainer" style="width: 45%; height:max-content; float: left; align-items: center; padding: 2%"
+            oninput="getDays()">
+            <fieldset>
+                <legend>Select Days</legend>
+                <input id="Saturday" name="day" type="checkbox" value="0" checked/>
+                <label for="Saturday"> Saturday</label><br />
+                <input id="Sunday" name="day" type="checkbox" value="1" checked/>
+                <label for="Sunday"> Sunday</label><br />
+                <input id="Monday" name="day" type="checkbox" value="2" checked/>
+                <label for="Monday"> Monday</label><br />
+                <input id="Tuesday" name="day" type="checkbox" value="3" checked/>
+                <label for="Tuesday"> Tuesday</label><br />
+                <input id="Wednesday" name="day" type="checkbox" value="4" checked/>
+                <label for="Wednesday"> Wednesday</label><br />
+                <input id="Thursday" name="day" type="checkbox" value="5" checked/>
+                <label for="Thursday"> Thursday</label><br /><br />
+            </fieldset>
+        </div>
+        <div id="timescontainer" style="width: 45%; height:max-content; float: right; align-items: center; padding: 2%"
+            oninput="getTimes()">
+            <fieldset>
+                <legend>Select Times</legend>
+                <input id="EightToNineTwenty" name="time" type="checkbox" value="0" checked/>
+                <label for="EightToNineTwenty"> 8:00 - 9:20</label><br />
+
+                <input id="NineThirtyToTenFifty" name="time" type="checkbox" value="1" checked/>
+                <label for="NineThirtyToTenFifty"> 9:30 - 10:50</label><br />
+
+                <input id="ElevenToTwelveTwenty" name="time" type="checkbox" value="2" checked/>
+                <label for="ElevenToTwelveTwenty"> 11:00 - 12:20</label><br />
+
+                <input id="TwelveThirtyToOneFifty" name="time" type="checkbox" value="3" checked/>
+                <label for="TwelveThirtyToOneFifty"> 12:30 - 1:50</label><br />
+
+                <input id="TwoToThreeTwenty" name="time" type="checkbox" value="4" checked/>
+                <label for="TwoToThreeTwenty"> 2:00 - 3:20</label><br />
+
+                <input id="ThreeThirtyToFourFifty" name="time" type="checkbox" value="5" checked/>
+                <label for="ThreeThirtyToFourFifty"> 3:30 - 4:50</label><br />
+
+                <input id="FiveToSixTwenty" name="time" type="checkbox" value="6" checked/>
+                <label for="FiveToSixTwenty"> 5:00 - 6:20</label><br />
+            </fieldset>
+        </div>
+        <input type="submit" value="Submit"
+            style="width:50%; height:2.5em; position: relative; left: 25%; margin-bottom: 1em;">
+    </div>
+</form>
+
+</html>

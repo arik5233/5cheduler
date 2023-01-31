@@ -155,8 +155,8 @@ class Routine:
         for classTime in holder[str(courseCode)].ClassTimes:
             if int(classTime[0]) == 2:
                 return False 
-            # if int(classTime[0]) == 3:
-                # return False 
+            if int(classTime[0]) == 3:
+                return False 
             if int(classTime[0]) == 4:
                 return False 
             if self.board[int(classTime[0])][int(classTime[2])] != 0:
@@ -186,7 +186,7 @@ class Routine:
 
 
 
-inputs = ['CSE340', 'CSE350', 'CSE461', 'CSE331']
+inputs = ['CSE340', 'CSE350', 'CSE461', 'CSE420']
 inputLen = len(inputs)
 
 def checkSequence(sequence):
@@ -223,7 +223,7 @@ if __name__== "__main__":
     combinations = [x for x in itertools.product(*coursesGrp)]
     # print(combinations[:10])
     # print(combinations[0])
-    with open('routines.txt', 'w') as f:
+    with open('sakibroutines.txt', 'w') as f:
         for sequence in combinations:
             board = Routine()
             if checkSequence(sequence):

@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template, request, redirect, url_for
 from bs4 import BeautifulSoup
 import requests
 from ast import literal_eval
@@ -113,6 +113,7 @@ class Course:
 
 
 holder = {f'{courses[0]}sec{courses[4]}': Course(courses) for courses in table[1:]}
+coursesHolder = [f'{courses[0]}' for courses in table[1:]]
 # 
 # print(holder['CSE111sec03'])
 # print('Lab?: ', holder['CSE111sec03'].labExists)
@@ -142,34 +143,91 @@ class Routine:
         self.Thursday = self.board[5]
         self.courses = []
 
-    def conflictChecker(self, courseCode):
+    def __str__(self) -> str:
+        return f'{self.Saturday}\n{self.Sunday}\n{self.Monday}\n{self.Tuesday}\n{self.Wednesday}\n{self.Thursday}'
+
+    def conflictChecker(self, courseCode, days, times, faculties):
         # if int(holder[f'{str(courseCode)}'].SeatRemaining) <= 0:
         #     return False
-            # print(f'No seats remaining for {courseCode}')
-        for eachDay in self.board:
-        #     for x in eachDay:
-        #         # print(x)
-        #         if courseCode[:6] in str(x):
-        #             return False
-            if holder[courseCode].CourseCode in eachDay:
+        def checkFaculty(self, courseCode, faculties):
+            if holder[courseCode].Faculty not in faculties:
                 return False
+            return True
+
+        def checkDay(self, classTime, day):
+            if int(classTime[0]) != int(day):
+                return False
+            return True
+        
+        def checkTime(self, classTime, time):
+            if int(classTime[2]) != int(time):
+                return False
+            return True
+
+        def courseExists(self, courseCode, eachDay):
+            if holder[courseCode].CourseCode not in eachDay:
+                return False
+            return True
+
+        def freeSlot(self, classTime):
+            if self.board[int(classTime[0])][int(classTime[2])] == 0:
+                return True
+            else:
+                return False
+
+        # for eachDay in self.board:
+        #     checkAlreadyExists = courseExists(self, courseCode, eachDay)
+        #     if not checkAlreadyExists:
+        #         continue
+        #     else:
+        #         return True
+
         for classTime in holder[str(courseCode)].ClassTimes:
-            if int(classTime[0]) == 2:
-                return False 
-            # if int(classTime[0]) == 3:
-                # return False 
-            if int(classTime[0]) == 4:
-                return False 
-            if self.board[int(classTime[0])][int(classTime[2])] != 0:
+            dayMatches, timeMatches = False, False
+            for day in days:
+                check = checkDay(self, classTime, day)
+                if not check:
+                    continue
+                else:
+                    dayMatches = True
+
+            for time in times:
+                check = checkTime(self, classTime, time)
+                if not check:
+                    continue
+                else:
+                    timeMatches = True
+                
+            freePos = freeSlot(self, classTime)
+            if not freePos:
                 return False
+
+        facultyCheck = checkFaculty(self, courseCode, faculties)
+        
+        if dayMatches and timeMatches and facultyCheck:
+            return True
+        else:
+            return False
+
+
+    def checkSequence(self, sequence, days, times, allCourseFaculties):
+        for x in range(len(sequence)):
+            if not self.conflictChecker(sequence[x], days, times, allCourseFaculties[x]):
+                return False
+            self.addCourse(sequence[x])
         return True
+    
+    def getFaculty(self, courseCode):
+        faculties = []
+        for x in holder.keys():
+            if courseCode in x:
+                faculties.append(holder[x].Faculty)
+        return faculties
 
     def addCourse(self, courseCode):
         self.courses.append(courseCode)
         for classTime in holder[courseCode].ClassTimes:
-            self.board[int(classTime[0])][int(classTime[2])] = courseCode
-
-                
+            self.board[int(classTime[0])][int(classTime[2])] = courseCode[:6]
 
     def generateRoutine(self):
         table = ['Day/Time', '8:00 - 9:20', '9:30 - 10:50', '11:00 - 12:20', '12:30 - 1:50', '2:00 - 3:20', '3:30 - 4:50', '5:00 - 6:20']
@@ -182,21 +240,20 @@ class Routine:
         # for x in range(len(self.board)):
         #     self.board[x].pop(0)
         t.add_rows(self.board)
-        return t
-
-
-
-
-inputs = ['CSE340', 'CSE350', 'CSE461', 'CSE331']
-inputLen = len(inputs)
-
-def checkSequence(sequence):
-    for courseCode in sequence:
-        if not board.conflictChecker(courseCode):
-            return False
-    return True
+        return t, self.board
                     
-    
+def makeCombination(inputs):
+    coursesGrp = [[] for x in range(len(inputs))]
+    # print(coursesGrp)
+    for x in range(len(inputs)):
+        for y in list(holder.keys()):
+            if inputs[x] in y:
+                coursesGrp[x].append(y)
+    # print(courses)
+    combinations = [x for x in itertools.product(*coursesGrp)]
+    return combinations
+
+
 # while True:
 #     if len(board.courses) == len(inputs):
 #         break
@@ -212,9 +269,42 @@ def checkSequence(sequence):
 # #Taking all the keys 
 # for x in holder.keys():
 #     courses.append(x)
-if __name__== "__main__":
-    count = 0
-    coursesGrp = [[] for x in range(inputLen)]
+# if __name__== "__main__":
+    # count = 0
+    # coursesGrp = [[] for x in range(inputLen)]
+    # # print(coursesGrp)
+    # for x in range(len(inputs)):
+    #     for y in list(holder.keys()):
+    #         if inputs[x] in y:
+    #             coursesGrp[x].append(y)
+    # # print(courses)
+    # combinations = [x for x in itertools.product(*coursesGrp)]
+    # print(combinations[:10])
+    # print(combinations[0])
+    # with open('routines.txt', 'w') as f:
+    #     for sequence in combinations:
+    #         board = Routine()
+    #         if checkSequence(sequence):
+    #             for courseCode in sequence:
+    #                 board.addCourse(courseCode)
+    #             for eachCourse in board.courses:
+    #                 f.writelines(f'{eachCourse} - {holder[eachCourse].Faculty} | ')
+    #             f.write('\n')
+    #             f.writelines(f'{board.generateRoutine()}\n \n \n')
+    #             count+=1
+    # print(count)
+
+def getFaculty(courseCode):
+        faculties = []
+        for x in holder.keys():
+            if courseCode in x:
+                faculties.append(holder[x].Faculty)
+        return faculties
+
+app = Flask('__name__', template_folder='templates', static_folder='static')
+
+def makeCombination(inputs):
+    coursesGrp = [[] for x in range(len(inputs))]
     # print(coursesGrp)
     for x in range(len(inputs)):
         for y in list(holder.keys()):
@@ -222,30 +312,81 @@ if __name__== "__main__":
                 coursesGrp[x].append(y)
     # print(courses)
     combinations = [x for x in itertools.product(*coursesGrp)]
-    # print(combinations[:10])
-    # print(combinations[0])
-    with open('routines.txt', 'w') as f:
+    return combinations
+
+@app.route('/', methods=['GET'])
+def home():
+    # global count
+    # count = request.form.get('count')
+    return render_template('index.html')
+
+@app.route('/routines', methods=['POST'])
+def routines():
+    # return render_template('routines.html', value=)
+    global allCourseFaculties, courses, times, days, combinations, arr
+    allCourseFaculties = []
+    try:
+        # print(request.form)
+        # get the number of courses from the form "form" in the html file with id "no_of_courses"
+        
+        courses = request.form.getlist('course')
+        times = request.form.getlist('time')
+        days = request.form.getlist('day')
+        # print(days)
+        for x in range(1, no+1):
+            faculties = request.form.getlist(f'checkboxFaculty{x}')
+            # print(faculties)
+            allCourseFaculties.append(faculties)
+        # print(no, courses, times, days, allCourseFaculties)
+        # print(allCourseFaculties)
+        combinations = makeCombination(courses)
+        routines = []
+        # arr = []
+        count = 0
         for sequence in combinations:
             board = Routine()
-            if checkSequence(sequence):
-                for courseCode in sequence:
-                    board.addCourse(courseCode)
+            checked = board.checkSequence(sequence, days, times, allCourseFaculties)
+            if checked:    
+                temp = ''
                 for eachCourse in board.courses:
-                    f.writelines(f'{eachCourse} - {holder[eachCourse].Faculty} | ')
-                f.write('\n')
-                f.writelines(f'{board.generateRoutine()}\n \n \n')
+                    temp += f'{eachCourse}-{holder[eachCourse].Faculty}  |  '
+                table, routineBoard = board.generateRoutine()
+                html_table = table.get_html_string()
+                routines.append((temp, html_table))
+                # arr.append(temp)
+                # print(f'{temp}\n \n')
                 count+=1
-    print(count)
+        # print(routines)
+        # print(routines)
+            else:
+                continue
+        # print(count)
+        if count==0:
+            return 'No Routines Found'
+        else:
+            return render_template('routines.html', value=routines)
+    except:
+        return 'Error Occured'
+    # print(routines)
+    # render routines.html file with value=routines
+    
+@app.route('/process_input', methods=['POST'])
+def process_input():
+    global no
+    allFaculties = []
+    courses = request.json['courses']
+    courses = [x.upper() for x in courses]
+    no = int(request.json['no'])
+    for course in courses:
+        allFaculties.append(getFaculty(course))
+    for x in range(len(allFaculties)):
+        allFaculties[x] = list(set(allFaculties[x]))
+    # print(allFaculties)
+    return allFaculties
 
+  
+# if __name__ == '__main__':
+#     app.run(debug=True)
 
-
-
-app = Flask('__name__')
-
-@app.route("/")
-def hello_world():
-    print(f'NOMAN')
-    return "<p>Hello, World!</p>"
-# create a post method that will take list of courses from the route
-@app.route("/courses", methods=['POST'])
-
+# gunicorn -w 4 -b 127.0.0.1:4000 app:app
+    # return redirect('routines.html', value=routines)
