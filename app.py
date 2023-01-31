@@ -374,8 +374,8 @@ def routines():
 def process_input():
     global no
     allFaculties = []
-    courses = request.json['courses']
-    courses = [x.upper() for x in courses]
+    coursesRand = request.json['courses']
+    courses = [x.upper() for x in coursesRand]
     no = int(request.json['no'])
     for course in courses:
         allFaculties.append(getFaculty(course))
