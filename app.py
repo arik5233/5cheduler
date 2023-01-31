@@ -323,14 +323,13 @@ def home():
 @app.route('/routines', methods=['POST'])
 def routines():
     # return render_template('routines.html', value=)
-    global allCourseFaculties, courses, times, days, combinations, arr
+    global allCourseFaculties, times, days, combinations, arr
     allCourseFaculties = []
     try:
         # print(request.form)
         # get the number of courses from the form "form" in the html file with id "no_of_courses"
         
-        coursesRandCase = request.form.getlist('course')
-        courses = [x.upper() for x in coursesRandCase]
+        
         times = request.form.getlist('time')
         days = request.form.getlist('day')
         # print(days)
@@ -373,12 +372,10 @@ def routines():
     
 @app.route('/process_input', methods=['POST'])
 def process_input():
-    global no
+    global no, courses
     allFaculties = []
-    coursesRand = request.json['courses']
-    # print(coursesRand)
-    courses = [x.upper() for x in coursesRand]
-    # print(courses)
+    coursesRandCase = request.form.getlist('course')
+    courses = [x.upper() for x in coursesRandCase]
     no = int(request.json['no'])
     for course in courses:
         allFaculties.append(getFaculty(course))
