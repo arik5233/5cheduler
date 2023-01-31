@@ -329,8 +329,8 @@ def routines():
         # print(request.form)
         # get the number of courses from the form "form" in the html file with id "no_of_courses"
         
-        coursesRand = request.form.getlist('course')
-        courses = [x.upper() for x in coursesRand]
+        coursesRandCase = request.form.getlist('course')
+        courses = [x.upper() for x in coursesRandCase]
         times = request.form.getlist('time')
         days = request.form.getlist('day')
         # print(days)
