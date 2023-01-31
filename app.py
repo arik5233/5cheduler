@@ -329,7 +329,8 @@ def routines():
         # print(request.form)
         # get the number of courses from the form "form" in the html file with id "no_of_courses"
         
-        courses = request.form.getlist('course')
+        coursesRand = request.form.getlist('course')
+        courses = [x.upper() for x in coursesRand]
         times = request.form.getlist('time')
         days = request.form.getlist('day')
         # print(days)
@@ -375,7 +376,9 @@ def process_input():
     global no
     allFaculties = []
     coursesRand = request.json['courses']
+    print(coursesRand)
     courses = [x.upper() for x in coursesRand]
+    print(courses)
     no = int(request.json['no'])
     for course in courses:
         allFaculties.append(getFaculty(course))
