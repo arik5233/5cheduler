@@ -154,20 +154,20 @@ class Routine:
                 return False
             return True
 
-        def checkDay(self, classTime, day):
-            if int(classTime[0]) != int(day):
-                return False
-            return True
+        # def checkDay(self, classTime, day):
+        #     if int(classTime[0]) != int(day):
+        #         return False
+        #     return True
         
-        def checkTime(self, classTime, time):
-            if int(classTime[2]) != int(time):
-                return False
-            return True
+        # def checkTime(self, classTime, time):
+        #     if int(classTime[2]) != int(time):
+        #         return False
+        #     return True
 
-        def courseExists(self, courseCode, eachDay):
-            if holder[courseCode].CourseCode not in eachDay:
-                return False
-            return True
+        # def courseExists(self, courseCode, eachDay):
+        #     if holder[courseCode].CourseCode not in eachDay:
+        #         return False
+        #     return True
 
         def freeSlot(self, classTime):
             if self.board[int(classTime[0])][int(classTime[2])] == 0:
@@ -183,20 +183,9 @@ class Routine:
         #         return True
 
         for classTime in holder[str(courseCode)].ClassTimes:
-            dayMatches, timeMatches = False, False
-            for day in days:
-                check = checkDay(self, classTime, day)
-                if not check:
-                    continue
-                else:
-                    dayMatches = True
-
-            for time in times:
-                check = checkTime(self, classTime, time)
-                if not check:
-                    continue
-                else:
-                    timeMatches = True
+            
+            if classTime[0] not in days or classTime[2] not in times:
+                return False
                 
             freePos = freeSlot(self, classTime)
             if not freePos:
@@ -204,7 +193,7 @@ class Routine:
 
         facultyCheck = checkFaculty(self, courseCode, faculties)
         
-        if dayMatches and timeMatches and facultyCheck:
+        if facultyCheck:
             return True
         else:
             return False
@@ -214,7 +203,8 @@ class Routine:
         for x in range(len(sequence)):
             if not self.conflictChecker(sequence[x], days, times, allCourseFaculties[x]):
                 return False
-            self.addCourse(sequence[x])
+            else:
+                self.addCourse(sequence[x])
         return True
     
     def getFaculty(self, courseCode):
@@ -323,12 +313,11 @@ def home():
 @app.route('/routines', methods=['POST'])
 def routines():
     # return render_template('routines.html', value=)
-    global allCourseFaculties, times, days, combinations, arr
+    global allCourseFaculties, times, days, combinations
     allCourseFaculties = []
     try:
         # print(request.form)
         # get the number of courses from the form "form" in the html file with id "no_of_courses"
-        
         
         times = request.form.getlist('time')
         days = request.form.getlist('day')
@@ -374,8 +363,8 @@ def routines():
 def process_input():
     global no, courses
     allFaculties = []
-    coursesRandCase = request.form.getlist('course')
-    courses = [x.upper() for x in coursesRandCase]
+    coursesRand = request.json['courses']
+    courses = [str(x).upper() for x in coursesRand]
     no = int(request.json['no'])
     for course in courses:
         allFaculties.append(getFaculty(course))
