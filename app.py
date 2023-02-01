@@ -183,7 +183,7 @@ class Routine:
         #         return True
 
         for classTime in holder[str(courseCode)].ClassTimes:
-            
+
             if classTime[0] not in days or classTime[2] not in times:
                 return False
                 
@@ -338,7 +338,7 @@ def routines():
             if checked:    
                 temp = ''
                 for eachCourse in board.courses:
-                    temp += f'{eachCourse}-{holder[eachCourse].Faculty}  |  '
+                    temp += f'{eachCourse[:6]}({eachCourse[9:]})-{holder[eachCourse].Faculty}  |  '
                 table, routineBoard = board.generateRoutine()
                 html_table = table.get_html_string()
                 routines.append((temp, html_table))
