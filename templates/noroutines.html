@@ -6,30 +6,20 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Routines</title>
-    <style>
-        table,
-        th,
-        td {
-            border: 2px solid black;
-            text-align: center;
-            font-size: 20px;
-        }
-    </style>
 </head>
 
 <body>
-
     {% include 'header.html' %}
     <main>
         <div id="routines" style="width: auto; background-color: powderblue; padding: 2%;">
-            {% for routine in value %}
-            <h3 style="display: flex; justify-content: center;">{{ routine[0] }}</h3>
-            <p style="display: flex; justify-content: center;">{{ routine[1] | safe }}</p> <br>
-            {% endfor %}
+            <div style="display: flex; justify-content: center;">
+                <h2 style="color: crimson;">NO ROUTINES FOUND</h2><br>
+            </div>
+            <div style="display: flex; justify-content: center;">
+                <h3 style="color: crimson;">Please refresh the page and check with different constraints.</h3>
+            </div>
         </div>
     </main>
-
-
 </body>
 
 </html>

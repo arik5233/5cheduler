@@ -315,47 +315,47 @@ def routines():
     # return render_template('routines.html', value=)
     global allCourseFaculties, times, days, combinations
     allCourseFaculties = []
-    # try:
+    try:
         # print(request.form)
         # get the number of courses from the form "form" in the html file with id "no_of_courses"
         
-    times = request.form.getlist('time')
-    days = request.form.getlist('day')
-    # print(days)
-    for x in range(1, no+1):
-        faculties = request.form.getlist(f'checkboxFaculty{x}')
-        # print(faculties)
-        allCourseFaculties.append(faculties)
-    # print(no, courses, times, days, allCourseFaculties)
-    # print(allCourseFaculties)
-    combinations = makeCombination(courses)
-    routines = []
-    # arr = []
-    count = 0
-    for sequence in combinations:
-        board = Routine()
-        checked = board.checkSequence(sequence, days, times, allCourseFaculties)
-        if checked:    
-            temp = ''
-            for eachCourse in board.courses:
-                temp += f'{eachCourse[:6]}({eachCourse[9:]})-{holder[eachCourse].Faculty}  |  '
-            table, routineBoard = board.generateRoutine()
-            html_table = table.get_html_string()
-            routines.append((temp, html_table))
-            # arr.append(temp)
-            # print(f'{temp}\n \n')
-            count+=1
-    # print(routines)
-    # print(routines)
+        times = request.form.getlist('time')
+        days = request.form.getlist('day')
+        # print(days)
+        for x in range(1, no+1):
+            faculties = request.form.getlist(f'checkboxFaculty{x}')
+            # print(faculties)
+            allCourseFaculties.append(faculties)
+        # print(no, courses, times, days, allCourseFaculties)
+        # print(allCourseFaculties)
+        combinations = makeCombination(courses)
+        routines = []
+        # arr = []
+        count = 0
+        for sequence in combinations:
+            board = Routine()
+            checked = board.checkSequence(sequence, days, times, allCourseFaculties)
+            if checked:    
+                temp = ''
+                for eachCourse in board.courses:
+                    temp += f'{eachCourse[:6]}({eachCourse[9:]})-{holder[eachCourse].Faculty}  |  '
+                table, routineBoard = board.generateRoutine()
+                html_table = table.get_html_string()
+                routines.append((temp, html_table))
+                # arr.append(temp)
+                # print(f'{temp}\n \n')
+                count+=1
+        # print(routines)
+        # print(routines)
+            else:
+                continue
+        # print(count)
+        if count==0:
+            return render_template('noroutines.html')
         else:
-            continue
-    # print(count)
-    if count==0:
-        return 'No Routines Found'
-    else:
-        return render_template('routines.html', value=routines)
-    # except:
-    #     return 'Error Occured'
+            return render_template('routines.html', value=routines)
+    except:
+        return render_template('header.html')
     # print(routines)
     # render routines.html file with value=routines
     
