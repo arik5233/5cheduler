@@ -304,6 +304,41 @@ def makeCombination(inputs):
     combinations = [x for x in itertools.product(*coursesGrp)]
     return combinations
 
+def makeRoutines():
+    global allCourseFaculties, times, days, combinations, count
+    allCourseFaculties = []
+    times = request.form.getlist('time')
+    days = request.form.getlist('day')
+    # print(days)
+    for x in range(1, no+1):
+        faculties = request.form.getlist(f'checkboxFaculty{x}')
+        # print(faculties)
+        allCourseFaculties.append(faculties)
+    # print(no, courses, times, days, allCourseFaculties)
+    # print(allCourseFaculties)
+    combinations = makeCombination(courses)
+    routines = []
+    # arr = []
+    count = 0
+    for sequence in combinations:
+        board = Routine()
+        checked = board.checkSequence(sequence, days, times, allCourseFaculties)
+        if checked:    
+            temp = ''
+            for eachCourse in board.courses:
+                temp += f'{eachCourse[:6]}({eachCourse[9:]})-{holder[eachCourse].Faculty}  |  '
+            table, routineBoard = board.generateRoutine()
+            html_table = table.get_html_string()
+            routines.append((temp, html_table))
+            # arr.append(temp)
+            # print(f'{temp}\n \n')
+            count+=1
+    # print(routines)
+        else:
+            continue
+    return routines
+
+
 @app.route('/', methods=['GET'])
 def home():
     # global count
@@ -313,51 +348,12 @@ def home():
 @app.route('/routines', methods=['POST'])
 def routines():
     # return render_template('routines.html', value=)
-    global allCourseFaculties, times, days, combinations
-    allCourseFaculties = []
-    try:
-        # print(request.form)
-        # get the number of courses from the form "form" in the html file with id "no_of_courses"
-        
-        times = request.form.getlist('time')
-        days = request.form.getlist('day')
-        # print(days)
-        for x in range(1, no+1):
-            faculties = request.form.getlist(f'checkboxFaculty{x}')
-            # print(faculties)
-            allCourseFaculties.append(faculties)
-        # print(no, courses, times, days, allCourseFaculties)
-        # print(allCourseFaculties)
-        combinations = makeCombination(courses)
-        routines = []
-        # arr = []
-        count = 0
-        for sequence in combinations:
-            board = Routine()
-            checked = board.checkSequence(sequence, days, times, allCourseFaculties)
-            if checked:    
-                temp = ''
-                for eachCourse in board.courses:
-                    temp += f'{eachCourse[:6]}({eachCourse[9:]})-{holder[eachCourse].Faculty}  |  '
-                table, routineBoard = board.generateRoutine()
-                html_table = table.get_html_string()
-                routines.append((temp, html_table))
-                # arr.append(temp)
-                # print(f'{temp}\n \n')
-                count+=1
-        # print(routines)
-        # print(routines)
-            else:
-                continue
+    routines = makeRoutines()
         # print(count)
-        if count==0:
-            return render_template('noroutines.html')
-        else:
-            return render_template('routines.html', value=routines)
-    except:
-        return render_template('header.html')
-    # print(routines)
-    # render routines.html file with value=routines
+    if count==0:
+        return render_template('noroutines.html')
+    else:
+        return render_template('routines.html', value=routines)
     
 @app.route('/process_input', methods=['POST'])
 def process_input():
