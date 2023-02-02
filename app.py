@@ -4,6 +4,7 @@ import requests
 from ast import literal_eval
 from prettytable import PrettyTable
 import itertools
+import threading
 
 r = requests.get('https://usis.bracu.ac.bd/academia/admissionRequirement/getAvailableSeatStatus')
 soup = BeautifulSoup(r.content,"html.parser")
@@ -347,8 +348,15 @@ def home():
 
 @app.route('/routines', methods=['POST'])
 def routines():
+    count, routines = None, None
+
+    # start calculation in a separate thread
+    thread = threading.Thread(target=makeRoutines)
+    thread.start()
+    thread.join()
     # return render_template('routines.html', value=)
     count, routines = makeRoutines()
+
         # print(count)
     if count==0:
         return render_template('noroutines.html')
