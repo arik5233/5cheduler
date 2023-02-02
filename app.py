@@ -305,7 +305,7 @@ def makeCombination(inputs):
     return combinations
 
 def makeRoutines():
-    global allCourseFaculties, times, days, combinations, count
+    global allCourseFaculties, times, days, combinations
     allCourseFaculties = []
     times = request.form.getlist('time')
     days = request.form.getlist('day')
@@ -336,7 +336,7 @@ def makeRoutines():
     # print(routines)
         else:
             continue
-    return routines
+    return count, routines
 
 
 @app.route('/', methods=['GET'])
@@ -348,7 +348,7 @@ def home():
 @app.route('/routines', methods=['POST'])
 def routines():
     # return render_template('routines.html', value=)
-    routines = makeRoutines()
+    count, routines = makeRoutines()
         # print(count)
     if count==0:
         return render_template('noroutines.html')
