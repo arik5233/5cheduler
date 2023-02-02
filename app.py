@@ -292,7 +292,7 @@ def getFaculty(courseCode):
                 faculties.append(holder[x].Faculty)
         return faculties
 
-app = Flask('__name__', template_folder='templates', static_folder='static')
+
 
 def makeCombination(inputs):
     coursesGrp = [[] for x in range(len(inputs))]
@@ -305,7 +305,7 @@ def makeCombination(inputs):
     combinations = [x for x in itertools.product(*coursesGrp)]
     return combinations
 
-def makeRoutines():
+def makeRoutines(no):
     global allCourseFaculties, times, days, combinations
     allCourseFaculties = []
     times = request.form.getlist('time')
@@ -339,7 +339,7 @@ def makeRoutines():
             continue
     return count, routines
 
-
+app = Flask('__name__', template_folder='templates', static_folder='static')
 @app.route('/', methods=['GET'])
 def home():
     # global count
@@ -355,13 +355,12 @@ def routines():
     thread.start()
     thread.join()
     # return render_template('routines.html', value=)
-    count, routines = makeRoutines()
+    count, routines = makeRoutines(no)
 
         # print(count)
     if count==0:
         return render_template('noroutines.html')
-    else:
-        return render_template('routines.html', value=routines)
+    return render_template('routines.html', value=routines)
     
 @app.route('/process_input', methods=['POST'])
 def process_input():
@@ -373,13 +372,13 @@ def process_input():
     for course in courses:
         allFaculties.append(getFaculty(course))
     for x in range(len(allFaculties)):
-        allFaculties[x] = list(set(allFaculties[x]))
+        allFaculties[x] = sorted(list(set(allFaculties[x])))
     # print(allFaculties)
     return allFaculties
 
   
-# if __name__ == '__main__':
-#     app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)
 
 # gunicorn -w 4 -b 127.0.0.1:4000 app:app
     # return redirect('routines.html', value=routines)
