@@ -320,7 +320,7 @@ def makeRoutines(no):
     combinations = makeCombination(courses)
     routines = []
     # arr = []
-    count = 0
+    count = -1
     for sequence in combinations:
         board = Routine()
         checked = board.checkSequence(sequence, days, times, allCourseFaculties)
@@ -337,7 +337,7 @@ def makeRoutines(no):
     # print(routines)
         else:
             continue
-    return count, routines
+    return count+1, routines
 
 app = Flask('__name__', template_folder='templates', static_folder='static')
 @app.route('/', methods=['GET'])
@@ -349,7 +349,6 @@ def home():
 @app.route('/routines', methods=['POST'])
 def routines():
     count, routines = None, None
-
     # start calculation in a separate thread
     thread = threading.Thread(target=makeRoutines)
     thread.start()
@@ -358,9 +357,10 @@ def routines():
     count, routines = makeRoutines(no)
 
         # print(count)
-    if count==0:
+    if count!=0:
+        return render_template('routines.html', value=routines)
+    else:
         return render_template('noroutines.html')
-    return render_template('routines.html', value=routines)
     
 @app.route('/process_input', methods=['POST'])
 def process_input():
