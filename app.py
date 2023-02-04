@@ -360,7 +360,7 @@ def routines():
     count, routines = makeRoutines()
 
         # print(count)
-    if count != 0:
+    if len(routines) != 0:
         return render_template('routines.html', value=routines)
     return render_template('noroutines.html')
     
