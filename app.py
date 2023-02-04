@@ -340,7 +340,7 @@ def makeRoutines():
     # print(routines)
         else:
             continue
-    return count, routines
+    return (count, routines)
 
 
 @app.route('/', methods=['GET'])
@@ -360,7 +360,7 @@ def routines():
     count, routines = makeRoutines()
 
         # print(count)
-    if len(routines) == 0:
+    if count == 0:
         return render_template('noroutines.html')
     else:
         return render_template('routines.html', value=routines)
