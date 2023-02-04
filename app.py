@@ -304,8 +304,9 @@ def makeCombination(inputs):
     # print(courses)
     combinations = [x for x in itertools.product(*coursesGrp)]
     return combinations
+app = Flask('__name__', template_folder='templates', static_folder='static')
 
-def makeRoutines(no):
+def makeRoutines(no=0):
     global allCourseFaculties, times, days, combinations
     allCourseFaculties = []
     times = request.form.getlist('time')
@@ -339,7 +340,6 @@ def makeRoutines(no):
             continue
     return count, routines
 
-app = Flask('__name__', template_folder='templates', static_folder='static')
 @app.route('/', methods=['GET'])
 def home():
     # global count
@@ -348,7 +348,7 @@ def home():
 
 @app.route('/routines', methods=['POST'])
 def routines():
-    count, routines = None, None
+    # count, routines = None, None
     # start calculation in a separate thread
     thread = threading.Thread(target=makeRoutines)
     thread.start()
@@ -357,9 +357,9 @@ def routines():
     count, routines = makeRoutines(no)
 
         # print(count)
-    if count != 0:
-        return render_template('routines.html', value=routines)
-    return render_template('noroutines.html')
+    if count == 0:
+        return render_template('noroutines.html')
+    return render_template('routines.html', value=routines)
     
 @app.route('/process_input', methods=['POST'])
 def process_input():
