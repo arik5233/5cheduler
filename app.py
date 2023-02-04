@@ -308,7 +308,7 @@ def makeCombination(inputs):
 app = Flask('__name__', template_folder='templates', static_folder='static')
 
 
-def makeRoutines(no):
+def makeRoutines():
     global allCourseFaculties, times, days, combinations
     allCourseFaculties = []
     times = request.form.getlist('time')
@@ -357,7 +357,7 @@ def routines():
     thread.start()
     thread.join()
     # return render_template('routines.html', value=)
-    count, routines = makeRoutines(no)
+    count, routines = makeRoutines()
 
         # print(count)
     if count != 0:
