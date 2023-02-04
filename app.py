@@ -357,9 +357,9 @@ def routines():
     count, routines = makeRoutines(no)
 
         # print(count)
-    if count == 0:
-        return render_template('noroutines.html')
-    return render_template('routines.html', value=routines)
+    if count != 0:
+        return render_template('routines.html', value=routines)
+    return render_template('noroutines.html')
     
 @app.route('/process_input', methods=['POST'])
 def process_input():
