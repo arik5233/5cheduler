@@ -304,9 +304,11 @@ def makeCombination(inputs):
     # print(courses)
     combinations = [x for x in itertools.product(*coursesGrp)]
     return combinations
+
 app = Flask('__name__', template_folder='templates', static_folder='static')
 
-def makeRoutines(no=0):
+
+def makeRoutines(no):
     global allCourseFaculties, times, days, combinations
     allCourseFaculties = []
     times = request.form.getlist('time')
@@ -339,6 +341,7 @@ def makeRoutines(no=0):
         else:
             continue
     return count, routines
+
 
 @app.route('/', methods=['GET'])
 def home():
